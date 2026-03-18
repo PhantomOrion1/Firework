@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Firework Gift Simulator</title>
+  <title>Firework Gift Simulator | 烟花礼物模拟器</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet" />
@@ -40,6 +40,22 @@
       margin: 22px auto 40px;
       display: grid;
       gap: 18px;
+    }
+
+    .lang-toggle {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 40;
+      border: 1px solid rgba(210, 224, 255, 0.55);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 0.02em;
+      background: linear-gradient(120deg, rgba(13, 26, 65, 0.96), rgba(23, 42, 96, 0.92));
+      color: #ecf2ff;
+      box-shadow: 0 8px 20px rgba(5, 11, 33, 0.45);
     }
 
     .card {
@@ -630,22 +646,31 @@
       {
         id: "s1",
         title: "Scenario 1: No Participation",
+        titleZh: "情景 1：无人参与",
         shortTitle: "No Participation",
+        shortTitleZh: "无人参与",
         summary: "No gifts, immediate Stage 0 explosion at t=10.",
+        summaryZh: "无礼物，t=10 时在阶段 0 爆炸。",
         gifts: [],
       },
       {
         id: "s2",
         title: "Scenario 2: Single Save -> Fail",
+        titleZh: "情景 2：单次救场后失败",
         shortTitle: "Single Save -> Fail",
+        shortTitleZh: "单次救场后失败",
         summary: "t=8 small gift reset, then no follow-up.",
+        summaryZh: "t=8 小礼物重置引线，之后无人继续送礼。",
         gifts: [{ t: 8, coins: 5, type: "small" }],
       },
       {
         id: "s3",
         title: "Scenario 3: Evolves Once -> Stops",
+        titleZh: "情景 3：进化一次后停止",
         shortTitle: "One Evolution",
+        shortTitleZh: "一次进化",
         summary: "t=4,7,9 gifts hit 30 coins and reach Stage 1.",
+        summaryZh: "t=4、7、9 送礼达到 30 金币并进入阶段 1。",
         gifts: [
           { t: 4, coins: 10, type: "small" },
           { t: 7, coins: 10, type: "small" },
@@ -655,8 +680,11 @@
       {
         id: "s4",
         title: "Scenario 4: Continuous Momentum",
+        titleZh: "情景 4：持续动量",
         shortTitle: "Momentum Run",
+        shortTitleZh: "动量连送",
         summary: "Frequent crowd gifts reach Stage 2, then activity drops.",
+        summaryZh: "高频送礼推进到阶段 2，随后热度下降。",
         gifts: [
           { t: 1.2, coins: 7, type: "small" },
           { t: 2.6, coins: 8, type: "small" },
@@ -672,8 +700,11 @@
       {
         id: "s5",
         title: "Scenario 5: Whale Boost",
+        titleZh: "情景 5：鲸鱼加速",
         shortTitle: "Whale Boost",
+        shortTitleZh: "鲸鱼加速",
         summary: "Quiet start, whale forces Stage 1, crowd pushes Stage 2.",
+        summaryZh: "前期平静，鲸鱼礼物直推阶段 1，随后人群推进到阶段 2。",
         gifts: [
           { t: 3, coins: 4, type: "small" },
           { t: 6, coins: 7000, type: "whale" },
@@ -685,8 +716,11 @@
       {
         id: "s6",
         title: "Scenario 6: Last-Second Save",
+        titleZh: "情景 6：最后一秒救场",
         shortTitle: "Last-Second Save",
+        shortTitleZh: "最后一秒救场",
         summary: "Gift at 9.5s saves fuse, then reaches Stage 1 briefly.",
+        summaryZh: "9.5 秒送礼救场，随后短暂进入阶段 1。",
         gifts: [
           { t: 9.5, coins: 8, type: "small" },
           { t: 12.0, coins: 12, type: "small" },
@@ -697,8 +731,11 @@
       {
         id: "s7",
         title: "Scenario 7: Reaches Final Stage",
+        titleZh: "情景 7：到达最终阶段",
         shortTitle: "Final Stage Run",
+        shortTitleZh: "最终阶段冲刺",
         summary: "Consistent support evolves to Stage 4 and auto-burns.",
+        summaryZh: "持续送礼进化到阶段 4，随后自动燃尽。",
         gifts: [
           { t: 1, coins: 10, type: "small" },
           { t: 2, coins: 10, type: "small" },
@@ -718,6 +755,100 @@
         ],
       },
     ];
+
+    const I18N = {
+      en: {
+        toggle: "中文",
+        title: "Firework Gift Simulator",
+        subtitle: "Live playback of fuse urgency, gifting collaboration, stage escalation, and explosion payoff.",
+        stageChip: (s) => `Stage ${s}`,
+        statTime: "Current Time",
+        statStage: "Stage",
+        statFuse: "Fuse Countdown",
+        statPower: "Explosion Strength",
+        fuse: "Fuse",
+        coinsToNext: "Coins Toward Next Stage",
+        finalReached: "Final stage reached",
+        visualExplosion: "Cinematic Detonation",
+        visualEvolve: "Stage Evolution Burst",
+        visualGift: "Gift Impact Pulse",
+        visualIdle: "Live Fuse Chamber",
+        runRandom: "Run Random Live",
+        pause: "Pause",
+        resume: "Resume",
+        restart: "Restart",
+        autoLoop: "Auto Loop",
+        on: "On",
+        off: "Off",
+        speed: "Speed",
+        eventLog: "Event Log",
+        randomBehavior: "Random behavior",
+        scenarioTabs: "Preset Scenario Tabs",
+        scenarioHint: "Click a scenario tab to run scripted behavior that overrides randomness.",
+        exploded: "EXPLODED",
+        stageDisplay: (stage, name) => (name === `Stage ${stage}` ? `${stage}` : `${stage} (${name})`),
+        bootEvent: "Auto-start active: Random Live running at 5x with Auto Loop ON.",
+        randomPrimed: "Random simulation primed at Stage 0.",
+        scenarioPrimed: (title) => `${title} primed at Stage 0.`,
+        ignoredGift: (type, coins) => `${type} gift (${coins}) ignored at Stage 4; auto-burn active.`,
+        giftReset: (type, coins, fuse) => `${type} gift +${coins} coins. Fuse reset to ${fuse}s.`,
+        lastSecond: (type, coins, fuseBefore) => `Last-second save! ${type} gift +${coins} at ${fuseBefore.toFixed(1)}s fuse.`,
+        evolved: (stage, name, fuse) => `EVOLVED -> Stage ${stage}${name}. Fuse now ${fuse}s.`,
+        finalStageMsg: "Final stage reached! (Stage 4 Gold) Fuse auto-burn active.",
+        explosion: (stage, power) => `EXPLOSION at Stage ${stage} - ${power} blast.`,
+      },
+      zh: {
+        toggle: "English",
+        title: "烟花礼物模拟器",
+        subtitle: "实时演示引线紧迫感、送礼协作、阶段升级与爆炸反馈。",
+        stageChip: (s) => `阶段 ${s}`,
+        statTime: "当前时间",
+        statStage: "阶段",
+        statFuse: "引线倒计时",
+        statPower: "爆炸强度",
+        fuse: "引线",
+        coinsToNext: "到下一阶段所需金币",
+        finalReached: "已达到最终阶段",
+        visualExplosion: "电影级爆炸",
+        visualEvolve: "阶段进化冲击",
+        visualGift: "礼物脉冲",
+        visualIdle: "实时引线舱",
+        runRandom: "随机实时运行",
+        pause: "暂停",
+        resume: "继续",
+        restart: "重置",
+        autoLoop: "自动循环",
+        on: "开",
+        off: "关",
+        speed: "速度",
+        eventLog: "事件日志",
+        randomBehavior: "随机行为",
+        scenarioTabs: "预设情景",
+        scenarioHint: "点击下方情景标签可运行脚本化示例并覆盖随机行为。",
+        exploded: "已爆炸",
+        stageDisplay: (stage, name) => {
+          const zhName = name === "Base" ? "基础" : name === "Purple" ? "紫色" : name === "Black" ? "黑色" : name === "Gold" ? "金色" : name;
+          return name === `Stage ${stage}` ? `${stage}` : `${stage}（${zhName}）`;
+        },
+        bootEvent: "已自动启动：随机实时模式，5x 速度，自动循环已开启。",
+        randomPrimed: "随机模拟已就绪：阶段 0。",
+        scenarioPrimed: (title) => `${title} 已就绪：阶段 0。`,
+        ignoredGift: (type, coins) => `${type} 礼物（${coins}）在阶段 4 被忽略；已进入自动燃尽。`,
+        giftReset: (type, coins, fuse) => `${type} 礼物 +${coins} 金币。引线已重置为 ${fuse}s。`,
+        lastSecond: (type, coins, fuseBefore) => `极限救场！${type} 礼物 +${coins}，触发时引线仅剩 ${fuseBefore.toFixed(1)}s。`,
+        evolved: (stage, name, fuse) => `已进化 -> 阶段 ${stage}${name}。引线更新为 ${fuse}s。`,
+        finalStageMsg: "已到达最终阶段！（阶段 4 金色）进入自动燃尽。",
+        explosion: (stage, power) => `阶段 ${stage} 发生爆炸 - ${power} 强度。`,
+      },
+    };
+
+    const POWER_ZH = {
+      "Very weak": "极弱",
+      "Weak": "较弱",
+      "Good": "良好",
+      "Great": "强烈",
+      "Maximum / cinematic": "最大 / 电影级",
+    };
 
     function randInt(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -744,6 +875,7 @@
     function App() {
       const [mode, setMode] = useState("random");
       const [scenarioId, setScenarioId] = useState(SCENARIOS[0].id);
+      const [lang, setLang] = useState("en");
       const [time, setTime] = useState(0);
       const [speedIndex, setSpeedIndex] = useState(2);
       const [running, setRunning] = useState(true);
@@ -758,7 +890,7 @@
 
       const [momentum, setMomentum] = useState(0);
       const [events, setEvents] = useState([
-        { id: 1, time: 0, text: "Auto-start active: Random Live running at 5x with Auto Loop ON.", type: "system" },
+        { id: 1, time: 0, text: I18N.en.bootEvent, type: "system" },
       ]);
       const [flash, setFlash] = useState("none");
       const [visualCue, setVisualCue] = useState({ type: "idle", id: 0 });
@@ -772,13 +904,32 @@
 
       const speed = SPEED_OPTIONS[speedIndex];
       const levelCfg = LEVELS[fw.level];
-      const nextCfg = LEVELS[fw.level + 1] || null;
-      const stageMeta =
-        levelCfg.name === `Stage ${fw.level}` ? `${fw.level}` : `${fw.level} (${levelCfg.name})`;
+      const t = I18N[lang];
+      const localizeStageName = (name, stage, uiLang = lang) => {
+        if (uiLang !== "zh") return name;
+        if (name === `Stage ${stage}`) return `阶段 ${stage}`;
+        if (name === "Base") return "基础";
+        if (name === "Purple") return "紫色";
+        if (name === "Black") return "黑色";
+        if (name === "Gold") return "金色";
+        return name;
+      };
+      const giftTypeText = (type) => {
+        if (lang !== "zh") return type.toUpperCase();
+        if (type === "small") return "小";
+        if (type === "medium") return "中";
+        if (type === "large") return "大";
+        if (type === "whale") return "鲸鱼";
+        return type;
+      };
+      const powerText = lang === "zh" ? POWER_ZH[levelCfg.power] || levelCfg.power : levelCfg.power;
+      const stageMeta = t.stageDisplay(fw.level, localizeStageName(levelCfg.name, fw.level));
       const selectedScenario = useMemo(
         () => SCENARIOS.find((s) => s.id === scenarioId) || SCENARIOS[0],
         [scenarioId]
       );
+      const scenarioTitle = lang === "zh" ? (selectedScenario.titleZh || selectedScenario.title) : selectedScenario.title;
+      const scenarioSummary = lang === "zh" ? (selectedScenario.summaryZh || selectedScenario.summary) : selectedScenario.summary;
 
       const fuseRatio = Math.max(0, fw.fuse / levelCfg.fuse);
       const progressRatio = levelCfg.threshold ? Math.min(1, fw.coins / levelCfg.threshold) : 1;
@@ -834,7 +985,9 @@
         }, 1000);
       }
 
-      function resetSimulation(autostart = false, nextMode = mode, scenario = selectedScenario) {
+      function resetSimulation(autostart = false, nextMode = mode, scenario = selectedScenario, uiLang = lang) {
+        const uiT = I18N[uiLang];
+        const scenarioText = uiLang === "zh" ? (scenario.titleZh || scenario.title) : scenario.title;
         scenarioPtrRef.current = 0;
         setTime(0);
         setRunning(autostart);
@@ -851,11 +1004,17 @@
             time: 0,
             text:
               nextMode === "random"
-                ? "Random simulation primed at Stage 0."
-                : `${scenario.title} primed at Stage 0.`,
+                ? uiT.randomPrimed
+                : uiT.scenarioPrimed(scenarioText),
             type: "system",
           },
         ]);
+      }
+
+      function toggleLanguage() {
+        const nextLang = lang === "en" ? "zh" : "en";
+        setLang(nextLang);
+        resetSimulation(running, mode, selectedScenario, nextLang);
       }
 
       function applyGift(gift, atTime) {
@@ -867,7 +1026,7 @@
             triggerVisual("gift", 500);
             triggerGiftPopup(gift.coins, gift.type);
             addEvent(
-              `${gift.type.toUpperCase()} gift (${gift.coins}) ignored at Stage 4; auto-burn active.`,
+              t.ignoredGift(giftTypeText(gift.type), gift.coins),
               "system",
               atTime
             );
@@ -881,12 +1040,12 @@
           };
 
           let eventType = "gift";
-          let message = `${gift.type.toUpperCase()} gift +${gift.coins} coins. Fuse reset to ${cfg.fuse}s.`;
+          let message = t.giftReset(giftTypeText(gift.type), gift.coins, cfg.fuse);
 
           if (fuseBefore < 3) {
             eventType = "warning";
             pulseFlash("panel-flash-warning");
-            message = `Last-second save! ${gift.type.toUpperCase()} gift +${gift.coins} at ${fuseBefore.toFixed(1)}s fuse.`;
+            message = t.lastSecond(giftTypeText(gift.type), gift.coins, fuseBefore);
             triggerVisual("gift", 620);
             triggerGiftPopup(gift.coins, gift.type);
           }
@@ -900,16 +1059,17 @@
             };
             pulseFlash("panel-flash-levelup");
             triggerVisual("levelup", 980);
+            const targetName = localizeStageName(target.name, nextState.level);
             const evolvedName =
-              target.name === `Stage ${nextState.level}` ? "" : ` (${target.name})`;
+              target.name === `Stage ${nextState.level}` ? "" : ` (${targetName})`;
             addEvent(
-              `EVOLVED -> Stage ${nextState.level}${evolvedName}. Fuse now ${target.fuse}s.`,
+              t.evolved(nextState.level, evolvedName, target.fuse),
               "level-up",
               atTime
             );
             if (nextState.level === 4) {
               addEvent(
-                "Final stage reached! (Stage 4 Gold) Fuse auto-burn active.",
+                t.finalStageMsg,
                 "level-up",
                 atTime
               );
@@ -931,7 +1091,7 @@
         pulseFlash("panel-flash-explosion", 1000);
         triggerVisual("explosion", 1200);
         addEvent(
-          `EXPLOSION at Stage ${explodedLevel} - ${LEVELS[explodedLevel].power} blast.`,
+          t.explosion(explodedLevel, lang === "zh" ? (POWER_ZH[LEVELS[explodedLevel].power] || LEVELS[explodedLevel].power) : LEVELS[explodedLevel].power),
           "explosion",
           atTime
         );
@@ -1044,39 +1204,42 @@
 
       return (
         <div className="container">
+          <button className="lang-toggle" onClick={toggleLanguage}>
+            {t.toggle}
+          </button>
           <section className={`card main ${flash}`} style={panelStyle}>
             <header>
-              <h1>Firework Gift Simulator</h1>
+              <h1>{t.title}</h1>
               <p className="subtitle">
-                Live playback of fuse urgency, gifting collaboration, stage escalation, and explosion payoff.
+                {t.subtitle}
                 <span className="chip" style={{ color: levelCfg.color }}>
-                  Stage {fw.level}
+                  {t.stageChip(fw.level)}
                 </span>
               </p>
             </header>
 
             <div className="stats">
               <div className="stat">
-                <span className="label">Current Time</span>
+                <span className="label">{t.statTime}</span>
                 <span className="value">{formatTime(time)}</span>
               </div>
               <div className="stat">
-                <span className="label">Stage</span>
+                <span className="label">{t.statStage}</span>
                 <span className="value">{stageMeta}</span>
               </div>
               <div className="stat">
-                <span className="label">Fuse Countdown</span>
+                <span className="label">{t.statFuse}</span>
                 <span className="value">{fw.fuse.toFixed(1)}s</span>
               </div>
               <div className="stat">
-                <span className="label">Explosion Strength</span>
-                <span className="value">{levelCfg.power}</span>
+                <span className="label">{t.statPower}</span>
+                <span className="value">{powerText}</span>
               </div>
             </div>
 
             <div className="fuse-wrap">
               <div className="bar-label">
-                <span>Fuse</span>
+                <span>{t.fuse}</span>
                 <span>{fw.fuse.toFixed(1)} / {levelCfg.fuse}s</span>
               </div>
               <div className="bar">
@@ -1086,9 +1249,9 @@
 
             <div className="progress-wrap">
               <div className="bar-label">
-                <span>Coins Toward Next Stage</span>
+                <span>{t.coinsToNext}</span>
                 <span>
-                  {levelCfg.threshold !== null ? `${fw.coins} / ${levelCfg.threshold}` : "Final stage reached"}
+                  {levelCfg.threshold !== null ? `${fw.coins} / ${levelCfg.threshold}` : t.finalReached}
                 </span>
               </div>
               <div className="bar">
@@ -1099,12 +1262,12 @@
             <div className={`live-stage ${visualCue.type}`} key={visualCue.id}>
               <span className="stage-label">
                 {visualCue.type === "explosion"
-                  ? "Cinematic Detonation"
+                  ? t.visualExplosion
                   : visualCue.type === "levelup"
-                    ? "Stage Evolution Burst"
+                    ? t.visualEvolve
                     : visualCue.type === "gift"
-                      ? "Gift Impact Pulse"
-                      : "Live Fuse Chamber"}
+                      ? t.visualGift
+                      : t.visualIdle}
               </span>
               <div className="spark-ring"></div>
               {visualCue.type === "explosion" && <div className="blast-flare"></div>}
@@ -1113,7 +1276,7 @@
                   <img
                     className="firework-image"
                     src={LEVEL_IMAGE_PATHS[fw.level]}
-                    alt={`Firework level ${fw.level}`}
+                    alt={`${t.statStage} ${fw.level}`}
                     onError={() =>
                       setBrokenImages((prev) => ({ ...prev, [fw.level]: true }))
                     }
@@ -1127,25 +1290,25 @@
               ))}
               {ended && (
                 <div className="exploded-overlay">
-                  <span>EXPLODED</span>
+                  <span>{t.exploded}</span>
                 </div>
               )}
             </div>
 
             <div className="controls">
               <button className="random-btn" onClick={startRandomLive} disabled={running && mode === "random" && !ended}>
-                Run Random Live
+                {t.runRandom}
               </button>
               <button onClick={togglePause} disabled={ended || (!running && time === 0)}>
-                {running ? "Pause" : "Resume"}
+                {running ? t.pause : t.resume}
               </button>
-              <button onClick={restart}>Restart</button>
+              <button onClick={restart}>{t.restart}</button>
               <button className={`auto-btn ${autoLoop ? "active" : ""}`} onClick={toggleAutoLoop}>
-                Auto Loop: {autoLoop ? "On" : "Off"}
+                {t.autoLoop}: {autoLoop ? t.on : t.off}
               </button>
 
               <div className="speed">
-                <label htmlFor="speed">Speed</label>
+                <label htmlFor="speed">{t.speed}</label>
                 <input
                   id="speed"
                   type="range"
@@ -1161,8 +1324,8 @@
 
             <div>
               <div className="bar-label">
-                <span>Event Log</span>
-                <span>{mode === "random" ? "Random behavior" : selectedScenario.title}</span>
+                <span>{t.eventLog}</span>
+                <span>{mode === "random" ? t.randomBehavior : scenarioTitle}</span>
               </div>
               <div className="event-log" ref={logRef}>
                 {events.map((event) => (
@@ -1187,7 +1350,7 @@
           </section>
 
           <section className="card scenarios">
-            <h2 style={{ margin: 0 }}>Preset Scenario Tabs</h2>
+            <h2 style={{ margin: 0 }}>{t.scenarioTabs}</h2>
             <div className="scenario-tabs">
               {SCENARIOS.map((scenario) => (
                 <button
@@ -1195,15 +1358,15 @@
                   className={`scenario-tab ${mode === "scenario" && scenario.id === scenarioId ? "active" : ""}`}
                   onClick={() => chooseScenario(scenario.id)}
                 >
-                  <strong>{scenario.shortTitle || scenario.title}</strong>
-                  <small>{scenario.summary}</small>
+                  <strong>{lang === "zh" ? (scenario.shortTitleZh || scenario.shortTitle || scenario.titleZh || scenario.title) : (scenario.shortTitle || scenario.title)}</strong>
+                  <small>{lang === "zh" ? (scenario.summaryZh || scenario.summary) : scenario.summary}</small>
                 </button>
               ))}
             </div>
             <p className="scenario-text">
               {mode === "scenario"
-                ? selectedScenario.summary
-                : "Click a scenario tab to run scripted behavior that overrides randomness."}
+                ? scenarioSummary
+                : t.scenarioHint}
             </p>
           </section>
         </div>
