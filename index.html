@@ -33,6 +33,15 @@
         linear-gradient(140deg, var(--bg-1), var(--bg-2));
       font-family: "Space Grotesk", "Segoe UI", sans-serif;
       min-height: 100vh;
+      zoom: 0.8;
+      transform-origin: top center;
+    }
+
+    @supports not (zoom: 0.8) {
+      body {
+        transform: scale(0.8);
+        width: 125%;
+      }
     }
 
     .container {
