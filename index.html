@@ -996,6 +996,11 @@
 
       function chooseScenario(id) {
         const scenario = SCENARIOS.find((s) => s.id === id) || SCENARIOS[0];
+        if (autoLoopTimeoutRef.current) {
+          clearTimeout(autoLoopTimeoutRef.current);
+        }
+        setAutoLoop(false);
+        setSpeedIndex(1);
         setMode("scenario");
         setScenarioId(id);
         resetSimulation(true, "scenario", scenario);
