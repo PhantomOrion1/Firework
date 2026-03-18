@@ -773,6 +773,8 @@
       const speed = SPEED_OPTIONS[speedIndex];
       const levelCfg = LEVELS[fw.level];
       const nextCfg = LEVELS[fw.level + 1] || null;
+      const stageMeta =
+        levelCfg.name === `Stage ${fw.level}` ? `${fw.level}` : `${fw.level} (${levelCfg.name})`;
       const selectedScenario = useMemo(
         () => SCENARIOS.find((s) => s.id === scenarioId) || SCENARIOS[0],
         [scenarioId]
@@ -898,8 +900,10 @@
             };
             pulseFlash("panel-flash-levelup");
             triggerVisual("levelup", 980);
+            const evolvedName =
+              target.name === `Stage ${nextState.level}` ? "" : ` (${target.name})`;
             addEvent(
-              `EVOLVED -> Stage ${nextState.level} (${target.name}). Fuse now ${target.fuse}s.`,
+              `EVOLVED -> Stage ${nextState.level}${evolvedName}. Fuse now ${target.fuse}s.`,
               "level-up",
               atTime
             );
@@ -1058,7 +1062,7 @@
               </div>
               <div className="stat">
                 <span className="label">Stage</span>
-                <span className="value">{fw.level} ({levelCfg.name})</span>
+                <span className="value">{stageMeta}</span>
               </div>
               <div className="stat">
                 <span className="label">Fuse Countdown</span>
