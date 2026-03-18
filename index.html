@@ -1,0 +1,1207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Firework Gift Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-1: #070a14;
+      --bg-2: #0c1230;
+      --card: rgba(20, 27, 54, 0.84);
+      --ink: #f0f4ff;
+      --muted: #a4b1d9;
+      --line: rgba(170, 188, 255, 0.24);
+      --danger: #ff4d74;
+      --ok: #19cb84;
+      --warn: #ffb236;
+      --shadow: 0 25px 55px rgba(3, 8, 28, 0.55);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 10%, #1b2e76 0%, transparent 42%),
+        radial-gradient(circle at 90% -20%, #1d1c4f 0%, transparent 45%),
+        radial-gradient(circle at 50% 120%, #0d364a 0%, transparent 50%),
+        linear-gradient(140deg, var(--bg-1), var(--bg-2));
+      font-family: "Space Grotesk", "Segoe UI", sans-serif;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: min(1120px, 94vw);
+      margin: 22px auto 40px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .main {
+      padding: 22px;
+      display: grid;
+      gap: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.3rem, 3.2vw, 2rem);
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat {
+      background: rgba(10, 17, 40, 0.72);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+
+    .stat .label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+
+    .stat .value {
+      font-family: "IBM Plex Mono", monospace;
+      font-weight: 600;
+      font-size: 1.08rem;
+    }
+
+    .fuse-wrap,
+    .progress-wrap {
+      display: grid;
+      gap: 6px;
+    }
+
+    .live-stage {
+      position: relative;
+      min-height: 190px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 50% 20%, rgba(130, 163, 255, 0.2), transparent 60%),
+        linear-gradient(180deg, rgba(15, 22, 50, 0.8), rgba(6, 10, 26, 0.9));
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+    }
+
+    .live-stage::before {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 38%;
+      background: linear-gradient(180deg, transparent, rgba(6, 9, 22, 0.95));
+      pointer-events: none;
+    }
+
+    .firework-shell {
+      width: min(260px, 58vw);
+      height: min(260px, 58vw);
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.04));
+      box-shadow: 0 0 35px rgba(132, 170, 255, 0.35);
+      position: relative;
+      z-index: 1;
+    }
+
+    .firework-core {
+      width: 62px;
+      height: 62px;
+      border-radius: 999px;
+      transition: transform 0.2s ease;
+      box-shadow: 0 0 28px currentColor;
+      background: radial-gradient(circle at 35% 28%, #ffffff, currentColor 70%);
+      animation: idleCore 1.8s ease-in-out infinite;
+    }
+
+    .firework-image {
+      width: 82%;
+      height: 82%;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 22px rgba(0, 0, 0, 0.48));
+      animation: hoverRocket 2.4s ease-in-out infinite;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    @keyframes hoverRocket {
+      0%, 100% { transform: translateY(0px) rotate(-1.5deg); }
+      50% { transform: translateY(-6px) rotate(1.5deg); }
+    }
+
+    .stage-label {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.8rem;
+      color: #e4ebff;
+      opacity: 0.92;
+    }
+
+    .spark-ring {
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 999px;
+      border: 1px dashed rgba(183, 203, 255, 0.35);
+      animation: spin 5s linear infinite;
+    }
+
+    .live-stage.gift .firework-core {
+      animation: giftPulse 0.4s ease-out 2;
+    }
+
+    .live-stage.gift .firework-image {
+      animation: giftRocket 0.55s ease-out 1;
+    }
+
+    .live-stage.levelup .firework-core {
+      animation: levelBurst 0.8s ease-out 1;
+    }
+
+    .live-stage.levelup .firework-image {
+      animation: levelRocket 0.9s ease-out 1;
+    }
+
+    .live-stage.explosion .firework-shell {
+      animation: blastShell 1.15s ease-out 1;
+    }
+
+    .live-stage.explosion .firework-core {
+      animation: blastCore 1.18s ease-out 1;
+    }
+
+    .live-stage.explosion .firework-image {
+      animation: blastImage 1.1s ease-out 1;
+    }
+
+    .live-stage.explosion .spark-ring {
+      animation: blastRing 0.95s ease-out 1;
+    }
+
+    @keyframes idleCore {
+      0%, 100% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.08); opacity: 1; }
+    }
+
+    @keyframes giftPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.25); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes levelBurst {
+      0% { transform: scale(1); }
+      60% { transform: scale(1.5); }
+      100% { transform: scale(1.1); }
+    }
+
+    @keyframes blastShell {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    @keyframes blastCore {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(2.8); opacity: 0; }
+    }
+
+    @keyframes blastImage {
+      0% { transform: scale(1); filter: drop-shadow(0 8px 22px rgba(0, 0, 0, 0.48)); opacity: 1; }
+      70% { transform: scale(1.55) rotate(4deg); filter: drop-shadow(0 0 28px rgba(255, 109, 142, 0.9)); opacity: 0.8; }
+      100% { transform: scale(2.05) rotate(8deg); opacity: 0; }
+    }
+
+    @keyframes blastRing {
+      0% { transform: scale(1); opacity: 0.65; border-color: rgba(255, 209, 120, 0.85); }
+      100% { transform: scale(2.8); opacity: 0; border-color: rgba(255, 107, 144, 0); }
+    }
+
+    @keyframes giftRocket {
+      0% { transform: scale(1); }
+      45% { transform: scale(1.13) rotate(2deg); }
+      100% { transform: scale(1) rotate(0); }
+    }
+
+    @keyframes levelRocket {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.18) rotate(-2deg); }
+      100% { transform: scale(1.03) rotate(0); }
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes stripeShift {
+      from { background-position: 0 0, 0 0; }
+      to { background-position: 20px 0, 0 0; }
+    }
+
+    .gift-pop {
+      position: absolute;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: #111b3a;
+      background: linear-gradient(90deg, #ffe289, #ffc95a);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35);
+      z-index: 3;
+      animation: giftRise 0.95s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes giftRise {
+      0% { opacity: 0; transform: translate(-50%, 8px) scale(0.9); }
+      15% { opacity: 1; }
+      100% { opacity: 0; transform: translate(-50%, -70px) scale(1.08); }
+    }
+
+    .blast-flare {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 226, 151, 0.6), rgba(255, 111, 139, 0.45) 35%, rgba(7, 11, 29, 0) 70%);
+      animation: blastFlare 0.9s ease-out forwards;
+      z-index: 2;
+    }
+
+    @keyframes blastFlare {
+      0% { opacity: 0; transform: scale(0.65); }
+      25% { opacity: 1; }
+      100% { opacity: 0; transform: scale(1.9); }
+    }
+
+    .exploded-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, rgba(8, 12, 28, 0.55), rgba(5, 8, 20, 0.82));
+      border: 1px solid rgba(255, 131, 156, 0.35);
+      backdrop-filter: blur(2px);
+    }
+
+    .exploded-overlay span {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: clamp(1.1rem, 3vw, 1.9rem);
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: #ffd3de;
+      text-transform: uppercase;
+      text-shadow: 0 0 16px rgba(255, 99, 136, 0.8);
+      border: 1px solid rgba(255, 179, 198, 0.45);
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(93, 23, 45, 0.42);
+    }
+
+    .bar {
+      position: relative;
+      height: 14px;
+      background: rgba(20, 34, 79, 0.75);
+      border: 1px solid rgba(160, 182, 255, 0.34);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .fill {
+      position: absolute;
+      inset: 0 auto 0 0;
+      transition: width 0.1s linear;
+    }
+
+    .fill-progress {
+      background-size: 20px 20px, 100% 100%;
+      background-position: 0 0, 0 0;
+      animation: stripeShift 0.9s linear infinite;
+    }
+
+    .bar-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 14px;
+      background: rgba(13, 23, 54, 0.92);
+      color: var(--ink);
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: transform 0.14s ease, background 0.14s ease;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      background: rgba(32, 53, 116, 0.9);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .speed {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+    }
+
+    .speed output {
+      width: 40px;
+      text-align: right;
+      font-family: "IBM Plex Mono", monospace;
+      font-weight: 600;
+    }
+
+    input[type="range"] {
+      accent-color: #2a66ff;
+    }
+
+    .event-log {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(7, 12, 29, 0.72);
+      max-height: 220px;
+      overflow: auto;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .event-item {
+      border-radius: 9px;
+      border: 1px solid rgba(180, 199, 255, 0.25);
+      background: rgba(17, 26, 56, 0.82);
+      padding: 8px 10px;
+      font-size: 0.9rem;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .event-time {
+      color: #9eb0e9;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.83rem;
+      min-width: 62px;
+    }
+
+    .event-level-up {
+      border-color: rgba(49, 240, 148, 0.72);
+      background: rgba(10, 65, 44, 0.55);
+    }
+
+    .event-warning {
+      border-color: rgba(255, 196, 92, 0.75);
+      background: rgba(90, 57, 13, 0.56);
+    }
+
+    .event-explosion {
+      border-color: rgba(255, 128, 152, 0.8);
+      background: rgba(97, 17, 40, 0.62);
+      font-weight: 700;
+    }
+
+    .panel-flash-levelup {
+      animation: glowLevelUp 0.75s ease;
+    }
+
+    .panel-flash-warning {
+      animation: glowWarning 0.75s ease;
+    }
+
+    .panel-flash-explosion {
+      animation: glowExplosion 1s ease;
+    }
+
+    @keyframes glowLevelUp {
+      0% { box-shadow: 0 0 0 0 rgba(22, 153, 104, 0.58); }
+      100% { box-shadow: var(--shadow); }
+    }
+
+    @keyframes glowWarning {
+      0% { box-shadow: 0 0 0 0 rgba(255, 159, 28, 0.62); }
+      100% { box-shadow: var(--shadow); }
+    }
+
+    @keyframes glowExplosion {
+      0% { box-shadow: 0 0 0 0 rgba(229, 63, 85, 0.65); }
+      100% { box-shadow: var(--shadow); }
+    }
+
+    .scenarios {
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .scenario-tabs {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(140px, 1fr));
+      gap: 8px;
+      overflow: auto;
+      padding-bottom: 6px;
+    }
+
+    .scenario-tab {
+      text-align: left;
+      min-height: 68px;
+      font-size: 0.84rem;
+      line-height: 1.25;
+      background: linear-gradient(160deg, rgba(23, 37, 84, 0.9), rgba(16, 25, 54, 0.88));
+      border-color: rgba(157, 176, 255, 0.28);
+    }
+
+    .scenario-tab.active {
+      background: linear-gradient(160deg, #dbe6ff, #f5f8ff);
+      color: #0d1632;
+      border-color: #dbe6ff;
+      box-shadow: 0 0 0 2px rgba(219, 230, 255, 0.25), 0 12px 22px rgba(10, 14, 34, 0.35);
+    }
+
+    .scenario-text {
+      color: var(--muted);
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    .scenario-tab strong {
+      display: block;
+      font-size: 0.84rem;
+      margin-bottom: 4px;
+    }
+
+    .scenario-tab small {
+      display: block;
+      opacity: 0.78;
+      font-size: 0.74rem;
+      line-height: 1.2;
+    }
+
+    .random-btn {
+      background: linear-gradient(95deg, #22c55e, #1ea6ff);
+      color: #051126;
+      border-color: rgba(219, 245, 255, 0.9);
+      box-shadow: 0 6px 18px rgba(30, 166, 255, 0.35);
+    }
+
+    .random-btn:hover:not(:disabled) {
+      background: linear-gradient(95deg, #2fe071, #35b4ff);
+    }
+
+    .random-btn:disabled {
+      opacity: 0.9;
+      color: #03101f;
+    }
+
+    .auto-btn {
+      background: linear-gradient(95deg, #5f6b9c, #3f4a7a);
+      color: #eaf0ff;
+    }
+
+    .auto-btn.active {
+      background: linear-gradient(95deg, #ffb12b, #ff6b8c);
+      color: #2a0815;
+      border-color: rgba(255, 234, 196, 0.9);
+      box-shadow: 0 8px 18px rgba(255, 125, 123, 0.35);
+    }
+
+    .chip {
+      display: inline-block;
+      border: 1px solid currentColor;
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    @media (max-width: 900px) {
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .speed {
+        width: 100%;
+        margin-left: 0;
+      }
+
+      .scenario-tabs {
+        grid-template-columns: repeat(2, minmax(160px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useEffect, useMemo, useRef, useState } = React;
+
+    const TICK_MS = 100;
+    const SPEED_OPTIONS = [1, 2, 5, 10];
+    const LEVEL_IMAGE_PATHS = [
+      "assets/fireworks/pasted-image.png",
+      "assets/fireworks/pasted-image (1).png",
+      "assets/fireworks/pasted-image (2).png",
+      "assets/fireworks/pasted-image (3).png",
+      "assets/fireworks/pasted-image (4).png",
+    ];
+
+    const LEVELS = [
+      { level: 0, name: "Base", price: 100, fuse: 10, power: "Very weak", threshold: 30, color: "#2c8eff" },
+      { level: 1, name: "Level 1", fuse: 15, power: "Weak", threshold: 250, color: "#12aa62" },
+      { level: 2, name: "Purple", fuse: 20, power: "Good", threshold: 2000, color: "#8848ff" },
+      { level: 3, name: "Black", fuse: 25, power: "Great", threshold: 10000, color: "#1f2434" },
+      { level: 4, name: "Gold", fuse: 3, power: "Maximum / cinematic", threshold: null, color: "#d4a017" },
+    ];
+
+    const GIFT_BANDS = {
+      small: [1, 10],
+      medium: [50, 200],
+      large: [500, 2000],
+      whale: [5000, 10000],
+    };
+
+    const SCENARIOS = [
+      {
+        id: "s1",
+        title: "Scenario 1: No Participation",
+        shortTitle: "No Participation",
+        summary: "No gifts, immediate Level 0 explosion at t=10.",
+        gifts: [],
+      },
+      {
+        id: "s2",
+        title: "Scenario 2: Single Save -> Fail",
+        shortTitle: "Single Save -> Fail",
+        summary: "t=8 small gift reset, then no follow-up.",
+        gifts: [{ t: 8, coins: 5, type: "small" }],
+      },
+      {
+        id: "s3",
+        title: "Scenario 3: Evolves Once -> Stops",
+        shortTitle: "One Evolution",
+        summary: "t=4,7,9 gifts hit 30 coins and reach Level 1.",
+        gifts: [
+          { t: 4, coins: 10, type: "small" },
+          { t: 7, coins: 10, type: "small" },
+          { t: 9, coins: 10, type: "small" },
+        ],
+      },
+      {
+        id: "s4",
+        title: "Scenario 4: Continuous Momentum",
+        shortTitle: "Momentum Run",
+        summary: "Frequent crowd gifts reach Level 2, then activity drops.",
+        gifts: [
+          { t: 1.2, coins: 7, type: "small" },
+          { t: 2.6, coins: 8, type: "small" },
+          { t: 4.1, coins: 9, type: "small" },
+          { t: 5.4, coins: 8, type: "small" },
+          { t: 8.0, coins: 60, type: "medium" },
+          { t: 10.0, coins: 55, type: "medium" },
+          { t: 12.0, coins: 48, type: "small" },
+          { t: 14.0, coins: 45, type: "small" },
+          { t: 16.0, coins: 42, type: "small" },
+        ],
+      },
+      {
+        id: "s5",
+        title: "Scenario 5: Whale Boost",
+        shortTitle: "Whale Boost",
+        summary: "Quiet start, whale forces Level 1, crowd pushes Level 2.",
+        gifts: [
+          { t: 3, coins: 4, type: "small" },
+          { t: 6, coins: 7000, type: "whale" },
+          { t: 9, coins: 70, type: "medium" },
+          { t: 11, coins: 90, type: "medium" },
+          { t: 13, coins: 100, type: "medium" },
+        ],
+      },
+      {
+        id: "s6",
+        title: "Scenario 6: Last-Second Save",
+        shortTitle: "Last-Second Save",
+        summary: "Gift at 9.5s saves fuse, then reaches Level 1 briefly.",
+        gifts: [
+          { t: 9.5, coins: 8, type: "small" },
+          { t: 12.0, coins: 12, type: "small" },
+          { t: 16.0, coins: 10, type: "small" },
+          { t: 18.0, coins: 4, type: "small" },
+        ],
+      },
+      {
+        id: "s7",
+        title: "Scenario 7: Reaches Final Stage",
+        shortTitle: "Final Stage Run",
+        summary: "Consistent support evolves to Level 4 and auto-burns.",
+        gifts: [
+          { t: 1, coins: 10, type: "small" },
+          { t: 2, coins: 10, type: "small" },
+          { t: 3, coins: 10, type: "small" },
+          { t: 5, coins: 80, type: "medium" },
+          { t: 7, coins: 90, type: "medium" },
+          { t: 9, coins: 100, type: "medium" },
+          { t: 12, coins: 600, type: "large" },
+          { t: 15, coins: 700, type: "large" },
+          { t: 18, coins: 800, type: "large" },
+          { t: 20, coins: 3000, type: "large" },
+          { t: 21, coins: 1800, type: "large" },
+          { t: 22, coins: 2200, type: "large" },
+          { t: 23, coins: 2600, type: "large" },
+          { t: 24, coins: 2800, type: "large" },
+          { t: 25, coins: 3000, type: "large" },
+        ],
+      },
+    ];
+
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function pickRandomGift() {
+      const roll = Math.random();
+      if (roll < 0.62) {
+        return { type: "small", coins: randInt(...GIFT_BANDS.small) };
+      }
+      if (roll < 0.88) {
+        return { type: "medium", coins: randInt(...GIFT_BANDS.medium) };
+      }
+      if (roll < 0.98) {
+        return { type: "large", coins: randInt(...GIFT_BANDS.large) };
+      }
+      return { type: "whale", coins: randInt(...GIFT_BANDS.whale) };
+    }
+
+    function formatTime(sec) {
+      return `${sec.toFixed(1)}s`;
+    }
+
+    function App() {
+      const [mode, setMode] = useState("random");
+      const [scenarioId, setScenarioId] = useState(SCENARIOS[0].id);
+      const [time, setTime] = useState(0);
+      const [speedIndex, setSpeedIndex] = useState(0);
+      const [running, setRunning] = useState(false);
+      const [ended, setEnded] = useState(false);
+      const [autoLoop, setAutoLoop] = useState(false);
+
+      const [fw, setFw] = useState({
+        level: 0,
+        fuse: LEVELS[0].fuse,
+        coins: 0,
+      });
+
+      const [momentum, setMomentum] = useState(0);
+      const [events, setEvents] = useState([
+        { id: 1, time: 0, text: "System ready. Start simulation.", type: "system" },
+      ]);
+      const [flash, setFlash] = useState("none");
+      const [visualCue, setVisualCue] = useState({ type: "idle", id: 0 });
+      const [brokenImages, setBrokenImages] = useState({});
+      const [giftPopups, setGiftPopups] = useState([]);
+
+      const nextEventIdRef = useRef(2);
+      const scenarioPtrRef = useRef(0);
+      const logRef = useRef(null);
+      const autoLoopTimeoutRef = useRef(null);
+
+      const speed = SPEED_OPTIONS[speedIndex];
+      const levelCfg = LEVELS[fw.level];
+      const nextCfg = LEVELS[fw.level + 1] || null;
+      const selectedScenario = useMemo(
+        () => SCENARIOS.find((s) => s.id === scenarioId) || SCENARIOS[0],
+        [scenarioId]
+      );
+
+      const fuseRatio = Math.max(0, fw.fuse / levelCfg.fuse);
+      const progressRatio = levelCfg.threshold ? Math.min(1, fw.coins / levelCfg.threshold) : 1;
+
+      useEffect(() => {
+        if (!logRef.current) return;
+        logRef.current.scrollTop = logRef.current.scrollHeight;
+      }, [events]);
+
+      useEffect(() => {
+        if (!running || ended) return;
+        const timer = setInterval(() => {
+          const dt = (TICK_MS / 1000) * speed;
+          tick(dt);
+        }, TICK_MS);
+        return () => clearInterval(timer);
+      }, [running, ended, speed, fw, mode, selectedScenario, momentum]);
+
+      useEffect(() => {
+        return () => {
+          if (autoLoopTimeoutRef.current) {
+            clearTimeout(autoLoopTimeoutRef.current);
+          }
+        };
+      }, []);
+
+      function addEvent(text, type = "system", t = time) {
+        setEvents((prev) => [
+          ...prev,
+          { id: nextEventIdRef.current++, time: t, text, type },
+        ]);
+      }
+
+      function pulseFlash(className, duration = 800) {
+        setFlash("none");
+        requestAnimationFrame(() => setFlash(className));
+        setTimeout(() => setFlash("none"), duration);
+      }
+
+      function triggerVisual(type, duration = 900) {
+        setVisualCue((prev) => ({ type, id: prev.id + 1 }));
+        setTimeout(() => {
+          setVisualCue((prev) => ({ ...prev, type: "idle" }));
+        }, duration);
+      }
+
+      function triggerGiftPopup(coins, type) {
+        const id = Date.now() + Math.random();
+        const icon = type === "whale" ? "🐳" : "🎁";
+        setGiftPopups((prev) => [...prev, { id, text: `${icon} +${coins}` }]);
+        setTimeout(() => {
+          setGiftPopups((prev) => prev.filter((p) => p.id !== id));
+        }, 1000);
+      }
+
+      function resetSimulation(autostart = false, nextMode = mode, scenario = selectedScenario) {
+        scenarioPtrRef.current = 0;
+        setTime(0);
+        setRunning(autostart);
+        setEnded(false);
+        setFw({ level: 0, fuse: LEVELS[0].fuse, coins: 0 });
+        setMomentum(0);
+        setFlash("none");
+        setVisualCue((prev) => ({ type: "idle", id: prev.id + 1 }));
+        setGiftPopups([]);
+        nextEventIdRef.current = 2;
+        setEvents([
+          {
+            id: 1,
+            time: 0,
+            text:
+              nextMode === "random"
+                ? "Random simulation primed at Level 0."
+                : `${scenario.title} primed at Level 0.`,
+            type: "system",
+          },
+        ]);
+      }
+
+      function applyGift(gift, atTime) {
+        setFw((current) => {
+          const cfg = LEVELS[current.level];
+          const fuseBefore = current.fuse;
+
+          if (current.level === 4) {
+            triggerVisual("gift", 500);
+            triggerGiftPopup(gift.coins, gift.type);
+            addEvent(
+              `${gift.type.toUpperCase()} gift (${gift.coins}) ignored at Level 4; auto-burn active.`,
+              "system",
+              atTime
+            );
+            return current;
+          }
+
+          let nextState = {
+            ...current,
+            coins: current.coins + gift.coins,
+            fuse: cfg.fuse,
+          };
+
+          let eventType = "gift";
+          let message = `${gift.type.toUpperCase()} gift +${gift.coins} coins. Fuse reset to ${cfg.fuse}s.`;
+
+          if (fuseBefore < 3) {
+            eventType = "warning";
+            pulseFlash("panel-flash-warning");
+            message = `Last-second save! ${gift.type.toUpperCase()} gift +${gift.coins} at ${fuseBefore.toFixed(1)}s fuse.`;
+            triggerVisual("gift", 620);
+            triggerGiftPopup(gift.coins, gift.type);
+          }
+
+          const target = LEVELS[current.level + 1];
+          if (target && cfg.threshold !== null && nextState.coins >= cfg.threshold) {
+            nextState = {
+              level: current.level + 1,
+              coins: 0,
+              fuse: target.fuse,
+            };
+            pulseFlash("panel-flash-levelup");
+            triggerVisual("levelup", 980);
+            addEvent(
+              `LEVEL UP -> Level ${nextState.level} (${target.name}). Fuse now ${target.fuse}s.`,
+              "level-up",
+              atTime
+            );
+            if (nextState.level === 4) {
+              addEvent(
+                "Final stage reached! (Level 4 Gold) Fuse auto-burn active.",
+                "level-up",
+                atTime
+              );
+            }
+          }
+
+          if (eventType === "gift") {
+            triggerVisual("gift", 520);
+            triggerGiftPopup(gift.coins, gift.type);
+          }
+          addEvent(message, eventType, atTime);
+          return nextState;
+        });
+      }
+
+      function triggerExplosion(explodedLevel, atTime) {
+        setEnded(true);
+        setRunning(false);
+        pulseFlash("panel-flash-explosion", 1000);
+        triggerVisual("explosion", 1200);
+        addEvent(
+          `EXPLOSION at Level ${explodedLevel} - ${LEVELS[explodedLevel].power} blast.`,
+          "explosion",
+          atTime
+        );
+
+        if (autoLoop) {
+          if (autoLoopTimeoutRef.current) {
+            clearTimeout(autoLoopTimeoutRef.current);
+          }
+          autoLoopTimeoutRef.current = setTimeout(() => {
+            setMode("random");
+            resetSimulation(true, "random", selectedScenario);
+          }, 1700);
+        }
+      }
+
+      function tick(dt) {
+        const newTime = time + dt;
+        setTime(newTime);
+
+        if (mode !== "random") {
+          const gifts = selectedScenario.gifts;
+          while (
+            scenarioPtrRef.current < gifts.length &&
+            gifts[scenarioPtrRef.current].t <= newTime
+          ) {
+            applyGift(gifts[scenarioPtrRef.current], gifts[scenarioPtrRef.current].t);
+            scenarioPtrRef.current += 1;
+          }
+        } else {
+          let chancePerSecond = 0.045 + momentum * 0.18;
+          if (fw.fuse < 3 && fw.level < 4) chancePerSecond += 0.22;
+          if (newTime < 5) chancePerSecond *= 0.8;
+          chancePerSecond = Math.min(0.92, chancePerSecond);
+
+          if (Math.random() < chancePerSecond * dt && fw.level < 4) {
+            const gift = pickRandomGift();
+            applyGift(gift, newTime);
+            setMomentum((m) => Math.min(1, m + (gift.type === "whale" ? 0.4 : 0.17)));
+          } else {
+            setMomentum((m) => Math.max(0, m - dt * 0.12));
+          }
+        }
+
+        setFw((current) => {
+          const fuseAfter = Math.max(0, current.fuse - dt);
+          if (fuseAfter === 0) {
+            setTimeout(() => triggerExplosion(current.level, newTime), 0);
+          }
+          return { ...current, fuse: fuseAfter };
+        });
+      }
+
+      function startRandomLive() {
+        setMode("random");
+        resetSimulation(true, "random", selectedScenario);
+      }
+
+      function togglePause() {
+        if (ended) return;
+        setRunning((r) => !r);
+      }
+
+      function restart() {
+        resetSimulation(false);
+      }
+
+      function chooseScenario(id) {
+        const scenario = SCENARIOS.find((s) => s.id === id) || SCENARIOS[0];
+        setMode("scenario");
+        setScenarioId(id);
+        resetSimulation(true, "scenario", scenario);
+      }
+
+      function toggleAutoLoop() {
+        setAutoLoop((prev) => {
+          const next = !prev;
+          if (!next && autoLoopTimeoutRef.current) {
+            clearTimeout(autoLoopTimeoutRef.current);
+          }
+          if (next) {
+            setMode("random");
+            resetSimulation(true, "random", selectedScenario);
+          }
+          return next;
+        });
+      }
+
+      const panelStyle = {
+        borderTop: `6px solid ${levelCfg.color}`,
+      };
+
+      const fuseFillStyle = {
+        width: `${Math.max(0, Math.min(100, fuseRatio * 100))}%`,
+        background:
+          fw.fuse < 3
+            ? "linear-gradient(90deg, #ff8c42, #ff3d6f)"
+            : `linear-gradient(90deg, ${levelCfg.color}, #80b9ff)`,
+      };
+
+      const progressFillStyle = {
+        width: `${Math.max(0, Math.min(100, progressRatio * 100))}%`,
+        backgroundImage:
+          "repeating-linear-gradient(135deg, rgba(255,255,255,0.26) 0 10px, rgba(255,255,255,0.04) 10px 20px), linear-gradient(90deg, #2cc7ff, #2fffa5)",
+      };
+
+      return (
+        <div className="container">
+          <section className={`card main ${flash}`} style={panelStyle}>
+            <header>
+              <h1>Firework Gift Simulator</h1>
+              <p className="subtitle">
+                Live playback of fuse urgency, gifting collaboration, level escalation, and explosion payoff.
+                <span className="chip" style={{ color: levelCfg.color }}>
+                  Level {fw.level}
+                </span>
+              </p>
+            </header>
+
+            <div className="stats">
+              <div className="stat">
+                <span className="label">Current Time</span>
+                <span className="value">{formatTime(time)}</span>
+              </div>
+              <div className="stat">
+                <span className="label">Level</span>
+                <span className="value">{fw.level} ({levelCfg.name})</span>
+              </div>
+              <div className="stat">
+                <span className="label">Fuse Countdown</span>
+                <span className="value">{fw.fuse.toFixed(1)}s</span>
+              </div>
+              <div className="stat">
+                <span className="label">Explosion Strength</span>
+                <span className="value">{levelCfg.power}</span>
+              </div>
+            </div>
+
+            <div className="fuse-wrap">
+              <div className="bar-label">
+                <span>Fuse</span>
+                <span>{fw.fuse.toFixed(1)} / {levelCfg.fuse}s</span>
+              </div>
+              <div className="bar">
+                <div className="fill" style={fuseFillStyle}></div>
+              </div>
+            </div>
+
+            <div className="progress-wrap">
+              <div className="bar-label">
+                <span>Coins Toward Next Level</span>
+                <span>
+                  {levelCfg.threshold !== null ? `${fw.coins} / ${levelCfg.threshold}` : "Final stage reached"}
+                </span>
+              </div>
+              <div className="bar">
+                <div className="fill fill-progress" style={progressFillStyle}></div>
+              </div>
+            </div>
+
+            <div className={`live-stage ${visualCue.type}`} key={visualCue.id}>
+              <span className="stage-label">
+                {visualCue.type === "explosion"
+                  ? "Cinematic Detonation"
+                  : visualCue.type === "levelup"
+                    ? "Level Evolution Burst"
+                    : visualCue.type === "gift"
+                      ? "Gift Impact Pulse"
+                      : "Live Fuse Chamber"}
+              </span>
+              <div className="spark-ring"></div>
+              {visualCue.type === "explosion" && <div className="blast-flare"></div>}
+              <div className="firework-shell" style={{ color: levelCfg.color }}>
+                {!brokenImages[fw.level] ? (
+                  <img
+                    className="firework-image"
+                    src={LEVEL_IMAGE_PATHS[fw.level]}
+                    alt={`Firework level ${fw.level}`}
+                    onError={() =>
+                      setBrokenImages((prev) => ({ ...prev, [fw.level]: true }))
+                    }
+                  />
+                ) : (
+                  <div className="firework-core" style={{ color: levelCfg.color }}></div>
+                )}
+              </div>
+              {giftPopups.map((popup) => (
+                <div key={popup.id} className="gift-pop">{popup.text}</div>
+              ))}
+              {ended && (
+                <div className="exploded-overlay">
+                  <span>EXPLODED</span>
+                </div>
+              )}
+            </div>
+
+            <div className="controls">
+              <button className="random-btn" onClick={startRandomLive} disabled={running && mode === "random" && !ended}>
+                Run Random Live
+              </button>
+              <button onClick={togglePause} disabled={ended || (!running && time === 0)}>
+                {running ? "Pause" : "Resume"}
+              </button>
+              <button onClick={restart}>Restart</button>
+              <button className={`auto-btn ${autoLoop ? "active" : ""}`} onClick={toggleAutoLoop}>
+                Auto Loop: {autoLoop ? "On" : "Off"}
+              </button>
+
+              <div className="speed">
+                <label htmlFor="speed">Speed</label>
+                <input
+                  id="speed"
+                  type="range"
+                  min="0"
+                  max="3"
+                  step="1"
+                  value={speedIndex}
+                  onChange={(e) => setSpeedIndex(Number(e.target.value))}
+                />
+                <output>{speed}x</output>
+              </div>
+            </div>
+
+            <div>
+              <div className="bar-label">
+                <span>Event Log</span>
+                <span>{mode === "random" ? "Random behavior" : selectedScenario.title}</span>
+              </div>
+              <div className="event-log" ref={logRef}>
+                {events.map((event) => (
+                  <div
+                    key={event.id}
+                    className={`event-item ${
+                      event.type === "level-up"
+                        ? "event-level-up"
+                        : event.type === "warning"
+                          ? "event-warning"
+                          : event.type === "explosion"
+                            ? "event-explosion"
+                            : ""
+                    }`}
+                  >
+                    <span className="event-time">t={event.time.toFixed(1)}</span>
+                    <span>{event.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section className="card scenarios">
+            <h2 style={{ margin: 0 }}>Preset Scenario Tabs</h2>
+            <div className="scenario-tabs">
+              {SCENARIOS.map((scenario) => (
+                <button
+                  key={scenario.id}
+                  className={`scenario-tab ${mode === "scenario" && scenario.id === scenarioId ? "active" : ""}`}
+                  onClick={() => chooseScenario(scenario.id)}
+                >
+                  <strong>{scenario.shortTitle || scenario.title}</strong>
+                  <small>{scenario.summary}</small>
+                </button>
+              ))}
+            </div>
+            <p className="scenario-text">
+              {mode === "scenario"
+                ? selectedScenario.summary
+                : "Click a scenario tab to run scripted behavior that overrides randomness."}
+            </p>
+          </section>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
