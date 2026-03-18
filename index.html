@@ -613,7 +613,7 @@
 
     const LEVELS = [
       { level: 0, name: "Base", price: 100, fuse: 10, power: "Very weak", threshold: 30, color: "#2c8eff" },
-      { level: 1, name: "Level 1", fuse: 15, power: "Weak", threshold: 250, color: "#12aa62" },
+      { level: 1, name: "Stage 1", fuse: 15, power: "Weak", threshold: 250, color: "#12aa62" },
       { level: 2, name: "Purple", fuse: 20, power: "Good", threshold: 2000, color: "#8848ff" },
       { level: 3, name: "Black", fuse: 25, power: "Great", threshold: 10000, color: "#1f2434" },
       { level: 4, name: "Gold", fuse: 3, power: "Maximum / cinematic", threshold: null, color: "#d4a017" },
@@ -631,7 +631,7 @@
         id: "s1",
         title: "Scenario 1: No Participation",
         shortTitle: "No Participation",
-        summary: "No gifts, immediate Level 0 explosion at t=10.",
+        summary: "No gifts, immediate Stage 0 explosion at t=10.",
         gifts: [],
       },
       {
@@ -645,7 +645,7 @@
         id: "s3",
         title: "Scenario 3: Evolves Once -> Stops",
         shortTitle: "One Evolution",
-        summary: "t=4,7,9 gifts hit 30 coins and reach Level 1.",
+        summary: "t=4,7,9 gifts hit 30 coins and reach Stage 1.",
         gifts: [
           { t: 4, coins: 10, type: "small" },
           { t: 7, coins: 10, type: "small" },
@@ -656,7 +656,7 @@
         id: "s4",
         title: "Scenario 4: Continuous Momentum",
         shortTitle: "Momentum Run",
-        summary: "Frequent crowd gifts reach Level 2, then activity drops.",
+        summary: "Frequent crowd gifts reach Stage 2, then activity drops.",
         gifts: [
           { t: 1.2, coins: 7, type: "small" },
           { t: 2.6, coins: 8, type: "small" },
@@ -673,7 +673,7 @@
         id: "s5",
         title: "Scenario 5: Whale Boost",
         shortTitle: "Whale Boost",
-        summary: "Quiet start, whale forces Level 1, crowd pushes Level 2.",
+        summary: "Quiet start, whale forces Stage 1, crowd pushes Stage 2.",
         gifts: [
           { t: 3, coins: 4, type: "small" },
           { t: 6, coins: 7000, type: "whale" },
@@ -686,7 +686,7 @@
         id: "s6",
         title: "Scenario 6: Last-Second Save",
         shortTitle: "Last-Second Save",
-        summary: "Gift at 9.5s saves fuse, then reaches Level 1 briefly.",
+        summary: "Gift at 9.5s saves fuse, then reaches Stage 1 briefly.",
         gifts: [
           { t: 9.5, coins: 8, type: "small" },
           { t: 12.0, coins: 12, type: "small" },
@@ -698,7 +698,7 @@
         id: "s7",
         title: "Scenario 7: Reaches Final Stage",
         shortTitle: "Final Stage Run",
-        summary: "Consistent support evolves to Level 4 and auto-burns.",
+        summary: "Consistent support evolves to Stage 4 and auto-burns.",
         gifts: [
           { t: 1, coins: 10, type: "small" },
           { t: 2, coins: 10, type: "small" },
@@ -745,10 +745,10 @@
       const [mode, setMode] = useState("random");
       const [scenarioId, setScenarioId] = useState(SCENARIOS[0].id);
       const [time, setTime] = useState(0);
-      const [speedIndex, setSpeedIndex] = useState(0);
-      const [running, setRunning] = useState(false);
+      const [speedIndex, setSpeedIndex] = useState(2);
+      const [running, setRunning] = useState(true);
       const [ended, setEnded] = useState(false);
-      const [autoLoop, setAutoLoop] = useState(false);
+      const [autoLoop, setAutoLoop] = useState(true);
 
       const [fw, setFw] = useState({
         level: 0,
@@ -758,7 +758,7 @@
 
       const [momentum, setMomentum] = useState(0);
       const [events, setEvents] = useState([
-        { id: 1, time: 0, text: "System ready. Start simulation.", type: "system" },
+        { id: 1, time: 0, text: "Auto-start active: Random Live running at 5x with Auto Loop ON.", type: "system" },
       ]);
       const [flash, setFlash] = useState("none");
       const [visualCue, setVisualCue] = useState({ type: "idle", id: 0 });
@@ -849,8 +849,8 @@
             time: 0,
             text:
               nextMode === "random"
-                ? "Random simulation primed at Level 0."
-                : `${scenario.title} primed at Level 0.`,
+                ? "Random simulation primed at Stage 0."
+                : `${scenario.title} primed at Stage 0.`,
             type: "system",
           },
         ]);
@@ -865,7 +865,7 @@
             triggerVisual("gift", 500);
             triggerGiftPopup(gift.coins, gift.type);
             addEvent(
-              `${gift.type.toUpperCase()} gift (${gift.coins}) ignored at Level 4; auto-burn active.`,
+              `${gift.type.toUpperCase()} gift (${gift.coins}) ignored at Stage 4; auto-burn active.`,
               "system",
               atTime
             );
@@ -899,13 +899,13 @@
             pulseFlash("panel-flash-levelup");
             triggerVisual("levelup", 980);
             addEvent(
-              `LEVEL UP -> Level ${nextState.level} (${target.name}). Fuse now ${target.fuse}s.`,
+              `EVOLVED -> Stage ${nextState.level} (${target.name}). Fuse now ${target.fuse}s.`,
               "level-up",
               atTime
             );
             if (nextState.level === 4) {
               addEvent(
-                "Final stage reached! (Level 4 Gold) Fuse auto-burn active.",
+                "Final stage reached! (Stage 4 Gold) Fuse auto-burn active.",
                 "level-up",
                 atTime
               );
@@ -927,7 +927,7 @@
         pulseFlash("panel-flash-explosion", 1000);
         triggerVisual("explosion", 1200);
         addEvent(
-          `EXPLOSION at Level ${explodedLevel} - ${LEVELS[explodedLevel].power} blast.`,
+          `EXPLOSION at Stage ${explodedLevel} - ${LEVELS[explodedLevel].power} blast.`,
           "explosion",
           atTime
         );
@@ -957,9 +957,9 @@
             scenarioPtrRef.current += 1;
           }
         } else {
-          let chancePerSecond = 0.045 + momentum * 0.18;
-          if (fw.fuse < 3 && fw.level < 4) chancePerSecond += 0.22;
-          if (newTime < 5) chancePerSecond *= 0.8;
+          let chancePerSecond = 0.06 + momentum * 0.22;
+          if (fw.fuse < 3 && fw.level < 4) chancePerSecond += 0.25;
+          if (newTime < 5) chancePerSecond *= 0.9;
           chancePerSecond = Math.min(0.92, chancePerSecond);
 
           if (Math.random() < chancePerSecond * dt && fw.level < 4) {
@@ -1039,9 +1039,9 @@
             <header>
               <h1>Firework Gift Simulator</h1>
               <p className="subtitle">
-                Live playback of fuse urgency, gifting collaboration, level escalation, and explosion payoff.
+                Live playback of fuse urgency, gifting collaboration, stage escalation, and explosion payoff.
                 <span className="chip" style={{ color: levelCfg.color }}>
-                  Level {fw.level}
+                  Stage {fw.level}
                 </span>
               </p>
             </header>
@@ -1052,7 +1052,7 @@
                 <span className="value">{formatTime(time)}</span>
               </div>
               <div className="stat">
-                <span className="label">Level</span>
+                <span className="label">Stage</span>
                 <span className="value">{fw.level} ({levelCfg.name})</span>
               </div>
               <div className="stat">
@@ -1077,7 +1077,7 @@
 
             <div className="progress-wrap">
               <div className="bar-label">
-                <span>Coins Toward Next Level</span>
+                <span>Coins Toward Next Stage</span>
                 <span>
                   {levelCfg.threshold !== null ? `${fw.coins} / ${levelCfg.threshold}` : "Final stage reached"}
                 </span>
@@ -1092,7 +1092,7 @@
                 {visualCue.type === "explosion"
                   ? "Cinematic Detonation"
                   : visualCue.type === "levelup"
-                    ? "Level Evolution Burst"
+                    ? "Stage Evolution Burst"
                     : visualCue.type === "gift"
                       ? "Gift Impact Pulse"
                       : "Live Fuse Chamber"}
